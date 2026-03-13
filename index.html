@@ -3,35 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VØID_X | HYPER ELITE PRO (Landscape Edition)</title>
+    <title>VØID_X | GLOBAL 3D ELITE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Cairo:wght@400;700&display=swap');
-        :root { --neon: #ff007f; --bg: #0a0a0a; }
+        :root { --neon: #ff007f; --bg: #050505; }
         
-        body, html { margin: 0; padding: 0; background: var(--bg); color: #fff; font-family: 'Cairo', sans-serif; }
+        body, html { margin: 0; padding: 0; background: var(--bg); color: #fff; font-family: 'Cairo', sans-serif; overflow-x: hidden; }
         
+        /* خلفية الجزيئات */
+        #particles-js { position: fixed; width: 100%; height: 100%; z-index: -1; }
+
         .viewport { 
-            max-width: 1000px; 
+            max-width: 800px; 
             margin: 80px auto; 
             padding: 10px;
             display: flex;
             flex-direction: column;
-            gap: 40px;
+            gap: 50px;
+            position: relative;
+            z-index: 1;
         }
 
+        /* كارت زجاجي احترافي */
         .card { 
             width: 100%; 
-            background: #111; 
-            border-radius: 15px; 
+            background: rgba(255, 255, 255, 0.03); 
+            border-radius: 24px; 
             overflow: hidden; 
-            border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
         }
+        .card:hover { transform: translateY(-5px); border-color: var(--neon); }
 
         .video-container {
             position: relative;
@@ -43,94 +53,88 @@
 
         video { width: 100%; height: 100%; object-fit: contain; }
 
-        /* نص وصفي 3D احترافي */
+        /* تأثير القلب عند الضغط المزدوج */
+        .heart-pop {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            color: var(--neon); font-size: 80px; pointer-events: none; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-shadow: 0 0 20px var(--neon); z-index: 10;
+        }
+        .heart-pop.active { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+
         .v-3d-header {
-            padding: 10px 15px;
-            background: linear-gradient(90deg, #1a1a1a, transparent);
-            border-bottom: 1px solid rgba(255,0,127,0.2);
+            padding: 15px 20px;
+            background: linear-gradient(180deg, rgba(255,0,127,0.1), transparent);
         }
-        .v-3d-header span { font-family: 'Orbitron'; font-size: 10px; color: var(--neon); letter-spacing: 2px; }
+        .v-3d-header span { font-family: 'Orbitron'; font-size: 11px; color: var(--neon); font-weight: 900; text-transform: uppercase; }
 
-        .video-footer {
-            padding: 15px;
-            background: #111;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        /* نظام تعليقات عالمي */
+        .video-comments-area { background: rgba(0,0,0,0.3); padding: 15px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .comment-item { 
+            background: rgba(255,255,255,0.05); padding: 8px 15px; border-radius: 15px; 
+            margin-bottom: 8px; font-size: 13px; animation: slideIn 0.3s ease;
         }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 
-        /* نظام التعليقات أسفل كل فيديو */
-        .video-comments-area {
-            background: #0d0d0d;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            padding: 10px;
+        /* إشعارات Toast */
+        #toast {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+            background: var(--neon); color: white; padding: 10px 25px; border-radius: 50px;
+            font-size: 14px; font-weight: bold; z-index: 5000; display: none; box-shadow: 0 0 20px var(--neon);
         }
-        .comments-list { max-height: 150px; overflow-y: auto; margin-bottom: 10px; font-size: 13px; }
-        .comment-item { background: rgba(255,255,255,0.03); padding: 5px 10px; border-radius: 8px; margin-bottom: 5px; border-right: 2px solid var(--neon); }
-        .comment-input-box { display: flex; gap: 5px; }
-        .comment-input-box input { flex: 1; background: #1a1a1a; border: none; border-radius: 5px; padding: 5px 10px; color: #fff; font-size: 12px; outline: none; }
-
-        .action-buttons { display: flex; gap: 10px; }
-        .btn-mini {
-            padding: 6px 12px;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.05);
-            font-size: 12px;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .btn-mini:hover { background: var(--neon); }
 
         header { 
-            position: fixed; top: 0; width: 100%; padding: 15px 20px; z-index: 1000; 
+            position: fixed; top: 0; width: 100%; padding: 15px 30px; z-index: 1000; 
             display: flex; justify-content: space-between; align-items: center; 
-            background: rgba(10,10,10,0.8); backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         nav { 
-            position: fixed; bottom: 20px; right: 20px; width: 60px;
-            flex-direction: column; height: auto; gap: 15px; border-radius: 30px;
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            padding: 15px 0; display: flex; align-items: center; z-index: 1000; 
+            position: fixed; bottom: 25px; right: 25px; width: 65px;
+            background: rgba(255,255,255,0.08); backdrop-filter: blur(15px);
+            border-radius: 35px; border: 1px solid rgba(255,255,255,0.1);
+            padding: 20px 0; display: flex; flex-direction: column; align-items: center; gap: 25px; z-index: 1000; 
         }
 
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; display: none; padding: 30px; }
-        
-        .smart-watermark { position: absolute; top: 10px; right: 10px; font-family: 'Orbitron'; font-size: 10px; color: rgba(255,255,255,0.2); }
+        .action-buttons .btn-mini { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.05); }
 
-        footer { text-align: center; padding: 30px; opacity: 0.4; font-size: 11px; font-family: 'Orbitron'; }
+        footer { text-align: center; padding: 50px; background: linear-gradient(to top, #000, transparent); }
     </style>
 </head>
 <body>
 
+    <div id="particles-js"></div>
+    <div id="toast">تم تحديث البيانات بنجاح!</div>
+
     <header>
-        <div class="glass-tag px-4 py-2 bg-white/5 rounded-full"><span class="font-black italic">VØID_X <span class="text-pink-500">PRO</span></span></div>
-        <div id="timer" class="font-[Orbitron] text-xs opacity-50">00:00:00</div>
+        <div class="flex items-center gap-3">
+            <div class="w-3 h-3 bg-pink-500 rounded-full animate-pulse"></div>
+            <span class="font-[Orbitron] font-black tracking-tighter text-xl">VØID_X <span class="text-pink-500 text-sm">GLOBAL</span></span>
+        </div>
+        <div id="timer" class="font-[Orbitron] text-xs opacity-70 bg-white/5 px-3 py-1 rounded-full border border-white/10">00:00:00</div>
     </header>
 
     <main class="viewport" id="feed">
         </main>
 
     <footer>
-        <p>VØID_X HYPER INTERFACE SYSTEM</p>
-        <p class="text-pink-500 mt-1">LATEST RELEASE: MARCH 2026</p>
+        <div class="font-[Orbitron] space-y-2">
+            <p class="text-xl font-black text-white/20">VØID_X HYPER INTERFACE</p>
+            <p class="text-pink-500 text-sm tracking-[5px]">RELEASE: 2026.03.13</p>
+            <p class="text-[10px] opacity-30 mt-4 max-w-xs mx-auto text-center">النظام العالمي الموحد لمعالجة الرندر ثلاثي الأبعاد والذكاء الاصطناعي البصري.</p>
+        </div>
     </footer>
 
     <nav>
-        <div onclick="openAdmin()"><i class="fas fa-fingerprint text-pink-500 text-xl cursor-pointer"></i></div>
-        <div class="w-[45px] h-[45px] bg-pink-600 rounded-full flex items-center justify-center cursor-pointer" id="upload-btn">
-            <i class="fas fa-plus text-white"></i>
+        <div onclick="openAdmin()"><i class="fas fa-fingerprint text-pink-500 text-2xl cursor-pointer"></i></div>
+        <div class="w-[50px] h-[50px] bg-pink-600 rounded-full flex items-center justify-center cursor-pointer shadow-lg shadow-pink-500/30" id="upload-btn">
+            <i class="fas fa-plus text-white text-xl"></i>
         </div>
-        <div onclick="openChatWithAd()"><i class="fas fa-comment-alt text-xl opacity-50 cursor-pointer"></i></div>
+        <div onclick="openChatWithAd()"><i class="fas fa-comment-dots text-2xl opacity-50 cursor-pointer"></i></div>
     </nav>
 
     <div id="admin-ui" class="overlay">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="font-[Orbitron] text-xl text-pink-500">GHOST_SYSTEM</h1>
+            <h1 class="font-[Orbitron] text-xl text-pink-500">SYSTEM_ACCESS</h1>
             <i class="fas fa-times text-2xl opacity-20 cursor-pointer" onclick="closeAdmin()"></i>
         </div>
         <div id="admin-list" class="space-y-3"></div>
@@ -138,12 +142,12 @@
 
     <div id="chat-ui" class="overlay flex-col">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="font-[Orbitron] text-xl text-pink-500">ENCRYPTED_LOGS</h1>
+            <h1 class="font-[Orbitron] text-xl text-pink-500">GLOBAL_RELAY</h1>
             <i class="fas fa-times text-2xl cursor-pointer" onclick="toggleChat()"></i>
         </div>
         <div id="chat-msgs" class="flex-1 overflow-y-auto space-y-4 p-4"></div>
         <div class="mt-4 flex gap-2">
-            <input type="text" id="msg-input" class="bg-white/5 flex-1 rounded-xl p-4 outline-none" placeholder="اكتب رسالتك...">
+            <input type="text" id="msg-input" class="bg-white/5 flex-1 rounded-xl p-4 outline-none border border-white/10" placeholder="تحدث مع العالم...">
             <button onclick="sendMsg()" class="bg-pink-600 px-6 rounded-xl"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
@@ -163,13 +167,19 @@
 
         let isMuted = true;
         let cachedVideos = {};
-        const USR_ID = "ELITE-" + Math.random().toString(36).substr(2, 4).toUpperCase();
+        const USR_ID = "G-ELITE-" + Math.random().toString(36).substr(2, 4).toUpperCase();
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg; t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 2500);
+        }
 
         function fireAd(link) { window.open(link, '_blank'); }
         function openChatWithAd() { fireAd(ADS.chat); toggleChat(); }
         setInterval(() => { document.getElementById('timer').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
 
-        // --- محرك عرض الفيديوهات المطور ---
+        // --- محرك العرض العالمي ---
         db.ref('videos').on('value', (snap) => {
             const feed = document.getElementById('feed');
             const data = snap.val();
@@ -179,66 +189,78 @@
             feed.innerHTML = '';
             Object.keys(data).reverse().forEach(id => {
                 const v = data[id];
-                const postDate = v.date || "2026/03/13";
                 const section = document.createElement('div');
                 section.className = 'card';
                 section.innerHTML = `
                     <div class="v-3d-header">
-                        <span>3D SPATIAL RENDERING ACTIVE</span>
-                        <p class="text-[11px] opacity-60 mt-1 italic">تجربة بصرية تفاعلية بتقنية الابعاد الثلاثية الفائقة.</p>
+                        <span>3D SPATIAL RENDERING // CORE ACTIVE</span>
+                        <p class="text-[11px] opacity-40 mt-1 italic font-light">Global decentralized visualization stream.</p>
                     </div>
-                    <div class="video-container" onclick="this.querySelector('video').paused ? this.querySelector('video').play() : this.querySelector('video').pause()">
-                        <div class="smart-watermark">VØID_X ELITE</div>
+                    <div class="video-container" id="container-${id}">
+                        <i class="fas fa-heart heart-pop" id="heart-${id}"></i>
+                        <div class="smart-watermark font-[Orbitron]">VØID_X INTERFACE</div>
                         <video loop playsinline muted data-src="${v.url}"></video>
                     </div>
                     <div class="video-footer">
                         <div>
-                            <div class="font-bold text-sm">VIDEO_LOG_${id.substring(0,4)}</div>
-                            <div class="text-[10px] opacity-40 mt-1"><i class="far fa-calendar-alt"></i> ${postDate}</div>
+                            <div class="font-[Orbitron] text-xs font-black text-pink-500 uppercase">Track: ${id.substring(0,6)}</div>
+                            <div class="text-[10px] opacity-40 mt-1 uppercase font-bold tracking-tighter">${v.date || 'Live Release'}</div>
                         </div>
                         <div class="action-buttons">
                             <div class="btn-mini" onclick="toggleMute(event, this)"><i class="fas ${isMuted ? 'fa-volume-mute' : 'fa-volume-up'}"></i></div>
-                            <div class="btn-mini" onclick="likeVid(event, '${id}')"><i class="fas fa-heart text-pink-500"></i> ${v.likes || 0}</div>
+                            <div class="btn-mini" onclick="likeVid(event, '${id}')"><i class="fas fa-bolt text-pink-500"></i> ${v.likes || 0}</div>
                         </div>
                     </div>
                     <div class="video-comments-area">
-                        <div class="comments-list" id="list-${id}">
-                            <div class="opacity-30 text-center italic py-2">لا يوجد تعليقات بعد.. كن أول من يرحب بالزوار</div>
-                        </div>
-                        <div class="comment-input-box">
-                            <input type="text" placeholder="تعليق ودود..." id="in-${id}">
-                            <button onclick="postComment('${id}')" class="text-pink-500 px-2"><i class="fas fa-paper-plane"></i></button>
+                        <div class="comments-list" id="list-${id}"></div>
+                        <div class="comment-input-box mt-3 bg-white/5 p-2 rounded-xl border border-white/5">
+                            <input type="text" placeholder="أضف تعليقاً عالمياً..." id="in-${id}" class="bg-transparent text-xs">
+                            <button onclick="postComment('${id}')" class="text-pink-500 px-3"><i class="fas fa-paper-plane"></i></button>
                         </div>
                     </div>`;
                 feed.appendChild(section);
+                
+                // إضافة ميزة الضغط المزدوج
+                const cont = document.getElementById(`container-${id}`);
+                let lastTap = 0;
+                cont.addEventListener('click', (e) => {
+                    const now = new Date().getTime();
+                    if (now - lastTap < 300) {
+                        handleDoubleTap(id);
+                    } else {
+                        const vid = cont.querySelector('video');
+                        vid.paused ? vid.play() : vid.pause();
+                    }
+                    lastTap = now;
+                });
+
                 listenToComments(id);
             });
             observeFeed();
         });
 
-        // --- وظائف التفاعل والتعليقات ---
-        function toggleMute(e, btn) {
-            e.stopPropagation(); fireAd(ADS.audio); 
-            isMuted = !isMuted; 
-            document.querySelectorAll('video').forEach(v => v.muted = isMuted);
-            btn.innerHTML = `<i class="fas ${isMuted ? 'fa-volume-mute' : 'fa-volume-up'}"></i>`;
+        function handleDoubleTap(id) {
+            const h = document.getElementById(`heart-${id}`);
+            h.classList.add('active');
+            setTimeout(() => h.classList.remove('active'), 800);
+            likeVid({stopPropagation: ()=>{}}, id);
+            showToast("Liked globally!");
         }
 
-        function likeVid(e, id) {
-            e.stopPropagation(); fireAd(ADS.like);
-            db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1);
-        }
-
+        // --- بقية الوظائف البرمجية الأصلية ---
+        function toggleMute(e, btn) { e.stopPropagation(); isMuted = !isMuted; document.querySelectorAll('video').forEach(v => v.muted = isMuted); btn.innerHTML = `<i class="fas ${isMuted ? 'fa-volume-mute' : 'fa-volume-up'}"></i>`; }
+        function likeVid(e, id) { e.stopPropagation(); db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1); }
         function postComment(vidId) {
             const input = document.getElementById(`in-${vidId}`);
             if(input.value.trim()) {
                 db.ref(`comments/${vidId}`).push({ u: USR_ID, t: input.value });
                 input.value = '';
+                showToast("Comment Shared!");
             }
         }
 
         function listenToComments(vidId) {
-            db.ref(`comments/${vidId}`).limitToLast(5).on('value', s => {
+            db.ref(`comments/${vidId}`).limitToLast(3).on('value', s => {
                 const list = document.getElementById(`list-${vidId}`);
                 if(!s.val()) return;
                 list.innerHTML = '';
@@ -246,49 +268,19 @@
                     const d = m.val();
                     list.innerHTML += `<div class="comment-item"><b>${d.u}:</b> ${d.t}</div>`;
                 });
-                list.scrollTop = list.scrollHeight;
             });
         }
 
-        // --- وظائف النظام الأصلية ---
         function openAdmin() { if(prompt("ACCESS CODE:") === "1234") { renderAdmin(); document.getElementById('admin-ui').style.display = 'block'; } }
         function closeAdmin() { document.getElementById('admin-ui').style.display = 'none'; }
         function toggleChat() { const c = document.getElementById('chat-ui'); c.style.display = (c.style.display==='flex'?'none':'flex'); }
 
-        function renderAdmin() {
-            const list = document.getElementById('admin-list');
-            list.innerHTML = '';
-            Object.keys(cachedVideos).forEach(id => {
-                list.innerHTML += `<div class="flex items-center justify-between bg-white/5 p-3 rounded-xl">
-                    <span class="text-xs opacity-50">${id}</span>
-                    <button onclick="deleteVid('${id}')" class="text-red-500"><i class="fas fa-trash"></i></button>
-                </div>`;
-            });
-        }
-        function deleteVid(id) { if(confirm("حذف؟")) { db.ref(`videos/${id}`).remove(); db.ref(`comments/${id}`).remove(); setTimeout(renderAdmin, 300); } }
-
-        function sendMsg() { 
-            const i = document.getElementById('msg-input'); 
-            if(i.value.trim()) { db.ref('chat').push({u: USR_ID, t: i.value}); i.value = ''; } 
-        }
-
-        db.ref('chat').limitToLast(15).on('value', s => {
-            const b = document.getElementById('chat-msgs'); b.innerHTML = '';
-            s.forEach(m => {
-                const d = m.val();
-                b.innerHTML += `<div class="bg-white/5 p-3 rounded-xl border-r-4 border-pink-500">
-                    <div class="text-[10px] text-pink-400">${d.u}</div>
-                    <div class="text-sm">${d.t}</div>
-                </div>`;
-            });
-            b.scrollTop = b.scrollHeight;
-        });
-
         const widget = cloudinary.createUploadWidget({ cloudName: "dk5kas1gc", uploadPreset: "go_kck" }, (err, res) => {
             if(!err && res.event === "success") {
                 const now = new Date();
-                const dateStr = now.getFullYear() + "/" + (now.getMonth()+1) + "/" + now.getDate();
+                const dateStr = now.getFullYear() + "." + (now.getMonth()+1) + "." + now.getDate();
                 db.ref('videos').push({url: res.info.secure_url, likes: 0, date: dateStr});
+                showToast("Upload Successful!");
             }
         });
         document.getElementById('upload-btn').onclick = () => widget.open();
@@ -297,14 +289,24 @@
             const obs = new IntersectionObserver(entries => {
                 entries.forEach(e => {
                     const v = e.target.querySelector('video');
-                    if(e.isIntersecting) {
-                        if(!v.src) v.src = v.dataset.src;
-                        v.play().catch(()=>{});
-                    } else { v.pause(); }
+                    if(e.isIntersecting) { if(!v.src) v.src = v.dataset.src; v.play().catch(()=>{}); } else { v.pause(); }
                 });
-            }, { threshold: 0.5 });
+            }, { threshold: 0.6 });
             document.querySelectorAll('.card').forEach(c => obs.observe(c));
         }
+
+        // إطلاق الجزيئات
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 80 },
+                "color": { "value": "#ff007f" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.2 },
+                "size": { "value": 2 },
+                "line_linked": { "enable": true, "distance": 150, "color": "#ff007f", "opacity": 0.1, "width": 1 },
+                "move": { "enable": true, "speed": 1 }
+            }
+        });
     </script>
 </body>
 </html>
