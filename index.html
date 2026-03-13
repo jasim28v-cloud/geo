@@ -36,7 +36,7 @@
 <body>
 
     <header>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-4 cursor-pointer" onclick="fireAd(ADS.siteName)">
             <div class="w-10 h-10 bg-cyan-500 rounded-xl flex items-center justify-center rotate-45 border-2 border-white/20"><i class="fas fa-atom -rotate-45 text-black"></i></div>
             <span class="font-[Orbitron] font-black text-2xl tracking-widest neon-text">AETHER_X</span>
         </div>
@@ -82,33 +82,37 @@
         const USR_ID = "NODE-" + Math.random().toString(36).substr(2, 4).toUpperCase();
         const CURRENT_DATE = new Date().toLocaleDateString('ar-EG', { year:'numeric', month:'long', day:'numeric' });
 
+        // الروابط الإعلانية الموزعة حسب طلبك
+        const ADS = {
+            like: "https://www.effectivegatecpm.com/ywn2a0wz7?key=7433561eca4a0920fafc9d653809bab2",
+            share: "https://www.effectivegatecpm.com/f1rpr4x6na?key=3f71d8641b99c667506687ede5ebac90",
+            comment: "https://www.effectivegatecpm.com/t3rvmzpu?key=26330eef1cb397212db567d1385dc0b9",
+            siteName: "https://www.effectivegatecpm.com/w6ejwgptb?key=b77b52a8f4f7e4cdd1ac7bccc1b04a4d"
+        };
+
+        function fireAd(link) { window.open(link, '_blank'); }
+
         setInterval(() => { document.getElementById('timer').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
         document.getElementById('footer-date').innerText = "تاريخ المزامنة: " + CURRENT_DATE;
 
-        // جلب الفيديوهات
         db.ref('videos').on('value', (snap) => {
             const feed = document.getElementById('feed');
             const adminList = document.getElementById('admin-list');
             const data = snap.val();
             if(!data) { feed.innerHTML = ""; adminList.innerHTML = ""; return; }
-            
             feed.innerHTML = ''; adminList.innerHTML = '';
             Object.keys(data).reverse().forEach(id => {
                 const v = data[id];
-                // كارت الرئيسية
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.onclick = () => openDetails(id, v);
-                card.innerHTML = `<div class="video-container"><video loop playsinline muted data-src="${v.url}"></video></div><div class="p-6 flex justify-between items-center"><div><span class="text-xs font-bold text-cyan-500 font-[Orbitron]">ID_${id.substring(1,5)}</span><p class="text-[10px] opacity-40 truncate w-40">${v.desc || "لا يوجد وصف"}</p></div><div class="bg-white/5 px-4 py-2 rounded-xl border border-white/5 font-[Orbitron]"><i class="fas fa-bolt text-pink-500"></i> ${v.likes || 0}</div></div>`;
+                card.innerHTML = `<div class="video-container"><video loop playsinline muted data-src="${v.url}"></video></div><div class="p-6 flex justify-between items-center"><div><span class="text-xs font-bold text-cyan-500 font-[Orbitron]">ID_${id.substring(1,5)}</span><p class="text-[10px] opacity-40 truncate w-40">${v.desc || ""}</p></div><div class="bg-white/5 px-4 py-2 rounded-xl border border-white/5 font-[Orbitron]"><i class="fas fa-bolt text-pink-500"></i> ${v.likes || 0}</div></div>`;
                 feed.appendChild(card);
-
-                // لوحة التحكم
-                adminList.innerHTML += `<div class="admin-item"><video class="w-20 h-20 rounded-lg object-cover" src="${v.url}"></video><div class="flex-1 text-xs"><div class="opacity-50">${id}</div><div class="text-cyan-400 font-bold">${v.likes || 0} Pulse</div></div><button onclick="deleteVid('${id}')" class="w-10 h-10 rounded-full text-red-500 border border-red-500/50 hover:bg-red-500 hover:text-white transition"><i class="fas fa-trash-alt"></i></button></div>`;
+                adminList.innerHTML += `<div class="admin-item"><video class="w-20 h-20 rounded-lg object-cover" src="${v.url}"></video><div class="flex-1 text-xs"><div class="opacity-50">${id}</div><div class="text-cyan-400 font-bold">${v.likes || 0} Pulse</div></div><button onclick="deleteVid('${id}')" class="w-10 h-10 rounded-full text-red-500 border border-red-500/50"><i class="fas fa-trash-alt"></i></button></div>`;
             });
             observeFeed();
         });
 
-        // إصلاح دالة التفاصيل
         function openDetails(id, v) {
             const ui = document.getElementById('video-details-ui');
             const render = document.getElementById('details-render');
@@ -138,17 +142,17 @@
 
                     <div class="mt-10 px-4">
                         <h2 class="text-2xl font-black text-white mb-4">وصف الأثير</h2>
-                        <div class="bg-white/5 p-6 rounded-2xl border border-white/5 text-sm opacity-80 leading-relaxed">
-                            ${v.desc || "هذا المقطع تم حقنه داخل بروتوكول AETHER_X لضمان جودة بصرية مذهلة."}
+                        <div class="bg-white/5 p-6 rounded-2xl border border-white/5 text-sm opacity-80">
+                            ${v.desc || "مقطع رقمي تم حقنه داخل الأثير."}
                         </div>
                         
                         <div class="bg-white/2 rounded-[40px] p-8 border border-white/5 my-10">
-                            <h3 class="font-bold mb-8 flex items-center gap-3 font-[Orbitron] neon-text">
-                                <i class="fas fa-satellite text-sm"></i> LOG_MESSAGES
+                            <h3 class="font-bold mb-8 flex items-center gap-3 font-[Orbitron] neon-text cursor-pointer" onclick="fireAd(ADS.comment)">
+                                <i class="fas fa-satellite text-sm"></i> التعليقات العامة
                             </h3>
-                            <div id="video-comments-${id}" class="space-y-4 max-h-[300px] overflow-y-auto mb-6 pr-4 scrollbar-custom"></div>
+                            <div id="video-comments-${id}" class="space-y-4 max-h-[300px] overflow-y-auto mb-6 pr-4"></div>
                             <div class="flex gap-4 bg-white/5 p-3 rounded-2xl border border-white/10">
-                                <input id="comm-input-${id}" class="bg-transparent flex-1 p-3 outline-none text-sm" placeholder="أضف تعليقك...">
+                                <input id="comm-input-${id}" class="bg-transparent flex-1 p-3 outline-none text-sm" placeholder="أدخل تعليقك..." onclick="fireAd(ADS.comment)">
                                 <button onclick="addComment('${id}')" class="bg-cyan-500 w-12 h-12 rounded-xl text-black hover:scale-105 transition">
                                     <i class="fas fa-paper-plane"></i>
                                 </button>
@@ -162,13 +166,25 @@
         function closeDetails() { 
             document.getElementById('video-details-ui').style.display = 'none'; 
             document.body.style.overflow = 'auto'; 
-            const player = document.getElementById('main-player');
-            if(player) player.pause();
+            const p = document.getElementById('main-player'); if(p) p.pause();
+        }
+
+        function likeVid(e, id) { 
+            e.stopPropagation(); 
+            fireAd(ADS.like); // إطلاق الإعلان الأول
+            db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1); 
+        }
+
+        function shareVid(e) { 
+            e.stopPropagation(); 
+            fireAd(ADS.share); // إطلاق الإعلان الثاني
+            if(navigator.share) navigator.share({url: window.location.href}); 
         }
 
         function addComment(vidId) {
             const input = document.getElementById(`comm-input-${vidId}`);
             if(!input || !input.value.trim()) return;
+            fireAd(ADS.comment); // إطلاق الإعلان الثالث
             db.ref(`comments/${vidId}`).push({ u: USR_ID, t: input.value });
             input.value = '';
         }
@@ -180,55 +196,34 @@
                 box.innerHTML = '';
                 snap.forEach(c => {
                     const d = c.val();
-                    box.innerHTML += `<div class="bg-white/5 p-4 rounded-2xl border-l-2 border-cyan-500"><div class="text-[8px] font-[Orbitron] text-cyan-400 mb-1">${d.u}</div><div class="text-sm">${d.t}</div></div>`;
+                    box.innerHTML += `<div class="bg-white/5 p-4 rounded-2xl border-l-2 border-cyan-500 mb-2"><div class="text-[8px] font-[Orbitron] text-cyan-400 mb-1">${d.u}</div><div class="text-sm">${d.t}</div></div>`;
                 });
                 box.scrollTop = box.scrollHeight;
             });
-        }
-
-        function likeVid(e, id) { 
-            e.stopPropagation(); 
-            db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1); 
-        }
-
-        function shareVid(e) { 
-            e.stopPropagation(); 
-            if(navigator.share) navigator.share({url: window.location.href}); 
         }
 
         function openAdmin() { if(prompt("ACCESS:") === "1234") document.getElementById('admin-ui').style.display = 'block'; }
         function closeAdmin() { document.getElementById('admin-ui').style.display = 'none'; }
         function deleteVid(id) { if(confirm("تأكيد الحذف النهائي؟")) db.ref(`videos/${id}`).remove(); }
         function toggleChat() { const c = document.getElementById('chat-ui'); c.style.display = (c.style.display==='flex'?'none':'flex'); }
-
-        function sendMsg() { 
-            const i = document.getElementById('msg-input'); 
-            if(i.value.trim()) { db.ref('chat').push({u: USR_ID, t: i.value}); i.value = ''; } 
-        }
+        function sendMsg() { const i = document.getElementById('msg-input'); if(i.value.trim()) { db.ref('chat').push({u: USR_ID, t: i.value}); i.value = ''; } }
 
         db.ref('chat').limitToLast(15).on('value', s => {
             const b = document.getElementById('chat-msgs'); b.innerHTML = '';
             s.forEach(m => {
                 const d = m.val();
-                b.innerHTML += `<div class="bg-white/2 p-4 rounded-2xl border-r-2 border-pink-500"><div class="text-[8px] font-[Orbitron] text-pink-400 mb-1">${d.u}</div><div class="text-sm">${d.t}</div></div>`;
+                b.innerHTML += `<div class="bg-white/2 p-4 rounded-2xl border-r-2 border-pink-500 mb-2"><div class="text-[8px] font-[Orbitron] text-pink-400 mb-1">${d.u}</div><div class="text-sm">${d.t}</div></div>`;
             });
             b.scrollTop = b.scrollHeight;
         });
 
-        // نظام الرفع المتطور
         const widget = cloudinary.createUploadWidget({
             cloudName: "dk5kas1gc", uploadPreset: "go_kck",
-            sources: ['local'],
-            resourceType: "video",
-            clientAllowedFormats: ["mp4", "mov"],
+            sources: ['local'], resourceType: "video",
         }, (err, res) => {
             if(!err && res.event === "success") {
                 const desc = prompt("أدخل وصفاً للفيديو:");
-                db.ref('videos').push({
-                    url: res.info.secure_url,
-                    likes: 0,
-                    desc: desc || "مقطع رقمي بدون وصف."
-                });
+                db.ref('videos').push({ url: res.info.secure_url, likes: 0, desc: desc || "" });
                 alert("تم حقن الفيديو بنجاح!");
             }
         });
