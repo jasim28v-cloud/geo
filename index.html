@@ -11,7 +11,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Cairo:wght@400;700&display=swap');
-        /* التعديل: تغيير اللون الأساسي للخلفية إلى البنفسجي العميق */
         :root { --neon: #00f3ff; --accent: #ff007f; --bg: #1a0a2e; --glass: rgba(255, 255, 255, 0.03); --border: rgba(255, 255, 255, 0.08); }
         body, html { margin: 0; padding: 0; background: var(--bg); color: #fff; font-family: 'Cairo', sans-serif; overflow-x: hidden; scroll-behavior: smooth; background-image: radial-gradient(circle at 50% 50%, #2d1b4d 0%, #1a0a2e 100%); }
         .neon-text { text-shadow: 0 0 10px var(--neon), 0 0 20px var(--neon); }
@@ -75,7 +74,7 @@
     <div id="chat-ui" class="overlay flex-col">
         <div class="flex justify-between items-center mb-8"><h1 class="font-[Orbitron] text-2xl accent-text">AETHER_LOGS</h1><i class="fas fa-times cursor-pointer text-3xl opacity-20" onclick="toggleChat()"></i></div>
         <div id="chat-msgs" class="flex-1 overflow-y-auto space-y-4 p-6 bg-white/5 rounded-[30px] mb-4 border border-white/5 shadow-inner"></div>
-        <div class="flex gap-3"><input type="text" id="msg-input" class="bg-white/5 flex-1 rounded-2xl p-5 outline-none border border-white/10 focus:border-cyan-500 transition shadow-lg" placeholder="رسالة مشفرة..."><button onclick="sendMsg()" class="bg-cyan-500 px-8 rounded-2xl text-black font-black hover:bg-cyan-400 transition shadow-[0_0_15px_rgba(0,243,255,0.3)]"><i class="fas fa-paper-plane"></i></button></div>
+        <div class="flex gap-3"><input type="text" id="msg-input" class="bg-white/5 flex-1 rounded-2xl p-5 outline-none border border-white/10 focus:border-cyan-500 transition shadow-lg" placeholder="رسالة مشفرة..."><button onclick="sendMsg()" class="bg-cyan-500 px-8 rounded-2xl text-black font-black hover:bg-cyan-400 transition shadow-[0_0_15_rgba(0,243,255,0.3)]"><i class="fas fa-paper-plane"></i></button></div>
     </div>
 
     <footer>
@@ -94,7 +93,7 @@
         const ADS = {
             like: "https://www.effectivegatecpm.com/ywn2a0wz7?key=7433561eca4a0920fafc9d653809bab2",
             share: "https://www.effectivegatecpm.com/f1rpr4x6na?key=3f71d8641b99c667506687ede5ebac90",
-            comment: "", // التعديل: إزالة رابط الإعلان من هنا
+            comment: "", 
             siteName: "https://www.effectivegatecpm.com/w6ejwgptb?key=b77b52a8f4f7e4cdd1ac7bccc1b04a4d"
         };
 
@@ -114,7 +113,8 @@
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.onclick = () => openDetails(id, v);
-                card.innerHTML = `<div class="video-container"><video loop playsinline muted controlsList="nodownload" disablePictureInPicture data-src="${v.url}"></video></div><div class="p-6 flex justify-between items-center"><div><span class="text-xs font-black text-cyan-500 font-[Orbitron] tracking-tighter">NODE_${id.substring(1,6)}</span><p class="text-[10px] opacity-40 truncate w-48 mt-1">${v.desc || ""}</p></div><div class="bg-white/5 px-4 py-2 rounded-xl border border-white/5 font-[Orbitron] flex items-center gap-2"><i class="fas fa-bolt text-pink-500 animate-pulse"></i> ${v.likes || 0}</div></div>`;
+                // التعديل هنا: إزالة muted ليعمل الصوت
+                card.innerHTML = `<div class="video-container"><video loop playsinline controlsList="nodownload" disablePictureInPicture data-src="${v.url}"></video></div><div class="p-6 flex justify-between items-center"><div><span class="text-xs font-black text-cyan-500 font-[Orbitron] tracking-tighter">NODE_${id.substring(1,6)}</span><p class="text-[10px] opacity-40 truncate w-48 mt-1">${v.desc || ""}</p></div><div class="bg-white/5 px-4 py-2 rounded-xl border border-white/5 font-[Orbitron] flex items-center gap-2"><i class="fas fa-bolt text-pink-500 animate-pulse"></i> ${v.likes || 0}</div></div>`;
                 feed.appendChild(card);
                 adminList.innerHTML += `<div class="admin-item"><video class="w-20 h-20 rounded-xl object-cover border border-white/10" src="${v.url}"></video><div class="flex-1"><div class="text-[10px] opacity-40 mb-1">ID: ${id}</div><div class="text-cyan-400 font-black">${v.likes || 0} Pulse</div></div><button onclick="deleteVid('${id}')" class="w-12 h-12 rounded-2xl bg-red-900/20 text-red-500 border border-red-500/30 hover:bg-red-500 hover:text-white transition"><i class="fas fa-trash-alt"></i></button></div>`;
             });
@@ -165,7 +165,6 @@
         function addComment(vidId) {
             const input = document.getElementById(`comm-input-${vidId}`);
             if(!input || !input.value.trim()) return;
-            // التعديل: إزالة استدعاء fireAd من هنا
             db.ref(`comments/${vidId}`).push({ u: USR_ID, t: input.value });
             input.value = '';
         }
@@ -217,6 +216,7 @@
             const obs = new IntersectionObserver(entries => {
                 entries.forEach(e => {
                     const v = e.target.querySelector('video');
+                    // التعديل هنا: تشغيل الفيديو بالصوت عند المرور عليه
                     if(e.isIntersecting) { if(!v.src) v.src = v.dataset.src; v.play().catch(()=>{}); } else { v.pause(); }
                 });
             }, { threshold: 0.65 });
