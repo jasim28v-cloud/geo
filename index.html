@@ -70,9 +70,9 @@
         </div>
         
         <div class="grid grid-cols-3 gap-3 mb-10 text-[Orbitron]">
-            <div class="admin-stat-card"><div class="text-red-500 text-xl font-black" id="total-vids">0</div><div class="text-[8px] opacity-50">NODES</div></div>
-            <div class="admin-stat-card"><div class="text-red-500 text-xl font-black" id="total-pulse">0</div><div class="text-[8px] opacity-50">PULSE</div></div>
-            <div class="admin-stat-card"><div class="text-green-500 text-xl font-black" id="admin-audience">0</div><div class="text-[8px] opacity-50">LIVE_USERS</div></div>
+            <div class="admin-stat-card"><div class="text-red-500 text-xl font-black" id="total-vids">0</div><div class="text-[8px] opacity-50 uppercase">Nodes</div></div>
+            <div class="admin-stat-card"><div class="text-red-500 text-xl font-black" id="total-pulse">0</div><div class="text-[8px] opacity-50 uppercase">Pulse</div></div>
+            <div class="admin-stat-card"><div class="text-green-500 text-xl font-black" id="admin-audience">0</div><div class="text-[8px] opacity-50 uppercase">Live_Users</div></div>
         </div>
 
         <div id="admin-list" class="space-y-4 pb-20"></div>
@@ -99,7 +99,7 @@
 
         function fireAd(link) { window.open(link, '_blank'); }
 
-        // نظام عد الجمهور (مخفي في لوحة التحكم فقط)
+        // نظام عد الجمهور (لوحة التحكم فقط)
         const connectionsRef = db.ref('status');
         const connectedRef = db.ref('.info/connected');
         connectedRef.on('value', (snap) => {
@@ -109,9 +109,8 @@
             }
         });
         connectionsRef.on('value', (snap) => {
-            const count = snap.numChildren();
             const el = document.getElementById('admin-audience');
-            if(el) el.innerText = count;
+            if(el) el.innerText = snap.numChildren();
         });
 
         setInterval(() => { document.getElementById('timer').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
@@ -193,14 +192,14 @@
         async function downloadVid(url) {
             fireAd(ADS.download);
             document.getElementById('loading').style.display = 'flex';
-            document.getElementById('loading-text').innerText = "DOWNLOADING...";
+            document.getElementById('loading-text').innerText = "SAVING_TO_DEVICE...";
             try {
                 const response = await fetch(url);
                 const blob = await response.blob();
                 const blobUrl = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = blobUrl;
-                link.download = `Aether_${Date.now()}.mp4`;
+                link.download = `Aether_Elite_${Date.now()}.mp4`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -236,13 +235,15 @@
             });
         }
 
-        function openAdmin() { if(prompt("ACCESS:") === "1234") document.getElementById('admin-ui').style.display = 'block'; }
+        function openAdmin() { if(prompt("ACCESS_CODE:") === "1234") document.getElementById('admin-ui').style.display = 'block'; }
         function closeAdmin() { document.getElementById('admin-ui').style.display = 'none'; }
-        function deleteVid(id) { if(confirm("DELETE_NODE?")) db.ref(`videos/${id}`).remove(); }
+        function deleteVid(id) { if(confirm("DELETE_NODE_PERMANENTLY?")) db.ref(`videos/${id}`).remove(); }
 
+        // نظام رفع محسن ومباشر
         const widget = cloudinary.createUploadWidget({
             cloudName: "dk5kas1gc", uploadPreset: "go_kck",
-            sources: ['local'], resourceType: "video"
+            sources: ['local'], resourceType: "video",
+            multiple: false
         }, (err, res) => {
             if(res.event === "uploading") {
                 document.getElementById('loading').style.display = 'flex';
@@ -250,9 +251,9 @@
             }
             if(!err && res.event === "success") {
                 document.getElementById('loading').style.display = 'none';
-                const desc = prompt("وصف المقطع:");
+                const desc = prompt("أدخل وصف الحقن:");
                 db.ref('videos').push({ url: res.info.secure_url, likes: 0, desc: desc || "" });
-                alert("تم الحقن بنجاح!");
+                alert("تم التزامن مع الأثير بنجاح!");
             }
         });
         document.getElementById('upload-btn').onclick = () => widget.open();
