@@ -102,7 +102,6 @@
         setInterval(() => { document.getElementById('timer').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
         document.getElementById('footer-date').innerText = "تاريخ المزامنة: " + CURRENT_DATE;
 
-        // استدعاء البيانات من فايربيس
         db.ref('videos').on('value', (snap) => {
             const feed = document.getElementById('feed');
             const adminList = document.getElementById('admin-list');
@@ -142,10 +141,11 @@
             render.innerHTML = `
                 <div class="details-content max-w-[900px] mx-auto p-4 pb-20">
                     <div class="video-container rounded-[40px] border border-white/10 shadow-[0_0_80px_rgba(0,0,0,0.8)] overflow-hidden">
-                        <video id="main-player" controls autoplay controlsList="nodownload" oncontextmenu="return false;" disablePictureInPicture src="${v.url}"></video>
+                        <video id="main-player" controls autoplay playsinline src="${v.url}"></video>
                     </div>
                     <div class="action-bar shadow-xl">
                         <div class="btn-action" onclick="likeVid(event, '${id}')"><i class="fas fa-atom"></i><span class="font-[Orbitron]">${v.likes || 0} PULSE</span></div>
+                        <div class="btn-action" onclick="downloadVid('${v.url}')"><i class="fas fa-cloud-download-alt text-green-400"></i><span>تحميل</span></div>
                         <div class="btn-action" onclick="shareVid(event)"><i class="fas fa-project-diagram"></i><span>توزيع</span></div>
                         <div class="btn-action"><i class="fas fa-fingerprint"></i><span class="text-[10px] opacity-60">${CURRENT_DATE}</span></div>
                     </div>
@@ -162,7 +162,22 @@
                         </div>
                     </div>
                 </div>`;
+            
+            // إلغاء كتم الصوت برمجياً
+            const player = document.getElementById('main-player');
+            player.muted = false;
+
             loadComments(id);
+        }
+
+        function downloadVid(url) {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'Aether_Video_' + Date.now() + '.mp4';
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function closeDetails() { 
@@ -171,7 +186,6 @@
             const p = document.getElementById('main-player'); if(p) p.pause();
         }
 
-        // الوظائف التفاعلية
         function likeVid(e, id) { e.stopPropagation(); fireAd(ADS.like); db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1); }
         function shareVid(e) { e.stopPropagation(); fireAd(ADS.share); if(navigator.share) navigator.share({url: window.location.href}); }
         function addComment(vidId) {
@@ -209,7 +223,6 @@
             b.scrollTop = b.scrollHeight;
         });
 
-        // نظام الرفع
         const widget = cloudinary.createUploadWidget({
             cloudName: "dk5kas1gc", uploadPreset: "go_kck",
             sources: ['local'], resourceType: "video",
@@ -226,7 +239,6 @@
         });
         document.getElementById('upload-btn').onclick = () => widget.open();
 
-        // تفعيل التشغيل عند التمرير
         function observeFeed() {
             const obs = new IntersectionObserver(entries => {
                 entries.forEach(e => {
