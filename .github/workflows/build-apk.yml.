@@ -3,20 +3,12 @@ name: 👑 Build LEGACY APK
 on:
   push:
     branches: [ main, master ]
-    tags:
-      - 'v*'
   workflow_dispatch:
-    inputs:
-      version_name:
-        description: 'Version Name'
-        required: false
-        default: '1.0.0'
   release:
     types: [ published ]
 
 permissions:
   contents: write
-  packages: write
 
 jobs:
   build-apk:
@@ -24,45 +16,37 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: 📥 Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: ☕ Setup Java
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: 🟢 Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: 📦 Install Capacitor CLI
-        run: |
-          npm install -g @capacitor/cli @capacitor/core @capacitor/android
+      - name: Install Capacitor
+        run: npm install -g @capacitor/cli @capacitor/core @capacitor/android
 
-      - name: 📁 Initialize Capacitor Project
+      - name: Create www folder
         run: |
           mkdir -p www
-          # نسخ جميع ملفات الموقع إلى www
           cp *.html www/ 2>/dev/null || true
           cp *.js www/ 2>/dev/null || true
-          cp *.css www/ 2>/dev/null || true
-          
-          # إنشاء package.json إذا لم يكن موجوداً
-          if [ ! -f package.json ]; then
-            cat > package.json << 'EOF'
+
+      - name: Create package.json
+        run: |
+          cat > package.json << 'EOF'
           {
             "name": "legacy-app",
             "version": "1.0.0",
-            "description": "LEGACY - Imperial Gold Glass Edition",
+            "description": "LEGACY",
             "main": "www/index.html",
-            "scripts": {
-              "build": "echo 'Built!'"
-            },
             "dependencies": {
               "@capacitor/android": "^6.0.0",
               "@capacitor/core": "^6.0.0",
@@ -70,150 +54,34 @@ jobs:
             }
           }
           EOF
-          fi
-          
-          # إنشاء capacitor.config.json
+
+      - name: Create capacitor.config.json
+        run: |
           cat > capacitor.config.json << 'EOF'
           {
             "appId": "com.legacy.imperial",
             "appName": "LEGACY",
-            "webDir": "www",
-            "server": {
-              "androidScheme": "https"
-            },
-            "plugins": {
-              "SplashScreen": {
-                "launchShowDuration": 2000,
-                "backgroundColor": "#0a0a0a",
-                "showSpinner": true,
-                "spinnerColor": "#d4a843"
-              }
-            }
+            "webDir": "www"
           }
           EOF
 
-      - name: 🔧 Install Dependencies
+      - name: Install Dependencies
         run: npm install
 
-      - name: 🤖 Add Android Platform
-        run: |
-          npx cap add android
-          
-          # تخصيص أيقونة التطبيق
-          mkdir -p android/app/src/main/res/values
-          cat > android/app/src/main/res/values/strings.xml << 'EOF'
-          <?xml version='1.0' encoding='utf-8'?>
-          <resources>
-              <string name="app_name">LEGACY</string>
-              <string name="title_activity_main">LEGACY 👑</string>
-              <string name="package_name">com.legacy.imperial</string>
-              <string name="custom_url_scheme">com.legacy.imperial</string>
-          </resources>
-          EOF
-          
-          # تخصيص الألوان
-          cat > android/app/src/main/res/values/colors.xml << 'EOF'
-          <?xml version='1.0' encoding='utf-8'?>
-          <resources>
-              <color name="colorPrimary">#d4a843</color>
-              <color name="colorPrimaryDark">#0a0a0a</color>
-              <color name="colorAccent">#f0c75e</color>
-          </resources>
-          EOF
+      - name: Add Android Platform
+        run: npx cap add android
 
-      - name: 📱 Copy Web Assets
+      - name: Sync Assets
         run: npx cap sync android
 
-      - name: 🛠️ Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: '8.7'
-
-      - name: 🔨 Build APK (Debug)
+      - name: Build APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: 🔨 Build APK (Release - Unsigned)
-        run: |
-          cd android
-          ./gradlew assembleRelease
-
-      - name: 📋 List APK Files
-        run: |
-          echo "📱 Generated APK files:"
-          find android -name "*.apk" -type f -exec ls -lh {} \;
-
-      - name: 📤 Upload Debug APK
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: LEGACY-Debug-APK
+          name: LEGACY-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 30
-          compression-level: 6
-
-      - name: 📤 Upload Release APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: LEGACY-Release-APK
-          path: android/app/build/outputs/apk/release/app-release-unsigned.apk
-          retention-days: 30
-          compression-level: 6
-
-  release-apk:
-    name: 🚀 Create Release
-    needs: build-apk
-    if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: 📥 Download Debug APK
-        uses: actions/download-artifact@v4
-        with:
-          name: LEGACY-Debug-APK
-          path: ./apks/
-
-      - name: 📥 Download Release APK
-        uses: actions/download-artifact@v4
-        with:
-          name: LEGACY-Release-APK
-          path: ./apks/
-
-      - name: 📋 List Downloaded Files
-        run: ls -lh ./apks/
-
-      - name: 🚀 Upload to GitHub Release
-        uses: softprops/action-gh-release@v2
-        if: github.event_name == 'release'
-        with:
-          files: |
-            ./apks/app-debug.apk
-            ./apks/app-release-unsigned.apk
-          body: |
-            # 👑 LEGACY - Imperial Gold Edition
-            
-            ## 📱 Android APK Build
-            
-            | النوع | الملف |
-            |-------|-------|
-            | Debug | `app-debug.apk` |
-            | Release | `app-release-unsigned.apk` |
-            
-            ### ⚠️ ملاحظة:
-            - **Debug APK**: جاهز للتثبيت والتجربة
-            - **Release APK**: يحتاج توقيع للتثبيت
-            
-            ### 🔧 تعليمات التثبيت:
-            1. حمّل ملف Debug APK
-            2. اسمح بتثبيت التطبيقات من مصادر غير معروفة
-            3. ثبّت التطبيق
-            4. استمتع 👑
-            
-            ---
-            💛 LEGACY 2026
-          draft: false
-          prerelease: false
-          generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
