@@ -3,30 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>💙 X-CLIP | رفع فيديو</title>
+    <title>👑 LEGACY | رفع فيديو</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root{--glass:rgba(14,165,233,0.03);--border:rgba(14,165,233,0.1);--accent:#0ea5e9;--accent2:#38bdf8;--bg:#060d17}
+        :root{--glass:rgba(212,168,67,0.03);--border:rgba(212,168,67,0.12);--accent:#d4a843;--accent2:#b8941f;--bg:#0a0a0a}
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:#fff;min-height:100vh;overflow-y:auto}
-        .header{display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid var(--border);background:rgba(6,13,23,0.7);backdrop-filter:blur(20px);position:sticky;top:0;z-index:10}
-        .btn-back{background:rgba(14,165,233,0.08);border:1px solid var(--border);width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;font-size:16px}
+        .header{display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid var(--border);background:rgba(10,10,10,0.7);backdrop-filter:blur(20px);position:sticky;top:0;z-index:10}
+        .btn-back{background:rgba(212,168,67,0.1);border:1px solid var(--border);width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#d4a843;cursor:pointer;font-size:16px}
         .container{max-width:500px;margin:0 auto;padding:20px}
-        .dropzone{border:2px dashed rgba(14,165,233,0.25);border-radius:20px;padding:50px 20px;text-align:center;cursor:pointer;background:var(--glass);margin-bottom:20px}
+        .dropzone{border:2px dashed rgba(212,168,67,0.3);border-radius:20px;padding:50px 20px;text-align:center;cursor:pointer;background:var(--glass);margin-bottom:20px}
         .dropzone i{font-size:48px;color:var(--accent)}
         .dropzone video{width:100%;max-height:250px;object-fit:contain;margin-top:12px;border-radius:12px;display:none}
-        .form-card{background:rgba(14,165,233,0.02);border:1px solid var(--border);border-radius:20px;padding:20px}
+        .form-card{background:rgba(212,168,67,0.03);border:1px solid var(--border);border-radius:20px;padding:20px}
         .form-card label{display:block;font-size:13px;opacity:0.7;margin-bottom:6px;margin-top:12px}
-        .form-card textarea,.form-card input{width:100%;padding:14px 16px;border-radius:16px;background:rgba(14,165,233,0.03);border:1px solid var(--border);color:#fff;font-size:14px;outline:none;resize:none;font-family:'Segoe UI',sans-serif}
+        .form-card textarea,.form-card input{width:100%;padding:14px 16px;border-radius:16px;background:rgba(212,168,67,0.04);border:1px solid var(--border);color:#fff;font-size:14px;outline:none;resize:none;font-family:'Segoe UI',sans-serif}
         .form-card textarea{min-height:80px}
         .progress-wrap{display:none;margin:16px 0}
         .progress-bar{background:rgba(255,255,255,0.1);border-radius:30px;height:6px;overflow:hidden}
         .progress-fill{background:linear-gradient(90deg,var(--accent),var(--accent2));height:100%;border-radius:30px;width:0%}
         .progress-text{text-align:center;font-size:12px;margin-top:6px;color:var(--accent2)}
-        .btn-upload{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:30px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;margin-top:16px;box-shadow:0 10px 25px rgba(14,165,233,0.3)}
+        .btn-upload{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:30px;color:#000;font-weight:700;font-size:15px;cursor:pointer;margin-top:16px;box-shadow:0 10px 25px rgba(212,168,67,0.3)}
         .btn-upload:disabled{opacity:0.5}
         .status{text-align:center;margin-top:12px;font-size:13px}
     </style>
